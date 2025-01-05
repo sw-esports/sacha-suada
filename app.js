@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/food-donation-app', {
+mongoose.connect('mongodb+srv://lordsjmys:NWNgyPDBhY5ep3uf@cluster0.mongodb.net/food-donation-app?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
