@@ -4,6 +4,7 @@
   "description": "this is app for the FOOD DONSTION btw HOTELD and NGO's",
   "main": "app.js",
   "scripts": {
+    "postinstall": "npm rebuild bcrypt",
     "dev": "nodemon --watch app.js",
     "start": "node app.js"
   },
