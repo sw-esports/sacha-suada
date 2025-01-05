@@ -4,7 +4,8 @@
   "description": "this is app for the FOOD DONSTION btw HOTELD and NGO's",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --watch app.js",
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
