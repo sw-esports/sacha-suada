@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -15,7 +16,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://lordsjmys:NWNgyPDBhY5ep3uf@cluster0.mongodb.net/food-donation-app?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://lordsjmy:NWNgyPDBhY5ep3uf@suraj.ntjic.mongodb.net/?retryWrites=true&w=majority&appName=suraj', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
