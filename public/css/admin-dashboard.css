@@ -1,0 +1,50 @@
+:root {
+    --primary-color: #ff5900;
+    --primary-color-hover: #d05508;
+    --border-color: #ccc;
+    --input-border-color: #ddd;
+    --error-color: red;
+    --text-color: white;
+}
+
+body {
+    background-image: url('/img/admin-dashboard-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+h1{
+    text-align: center;
+    color: var(--primary-color);
+}
+table {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+   
+    background-color: #f9f9f9e2;
+    width: 90%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid var(--primary-color);
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background-color: #ffebcd;
+}
+.verify-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.verified {
+    color: green;
+}

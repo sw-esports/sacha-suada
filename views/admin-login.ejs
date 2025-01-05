@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/css/admin-login.css">
+</head>
+<body>
+    <div class="container">
+
+        <div style="display: flex; justify-content: center;">
+            <img src="/img/admin.svg" alt="logo" style="width: 30px; height: 30px; margin-top: 15px; margin-right: 10px;">
+            <h2 style=" color: #ff3700;">Admin Login</h2>
+        </div>
+        
+        <% if (typeof error !== 'undefined') { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+
+        <form action="/admin-login" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+:root {
+    --primary-nav-color: #ff5900;
+    --primary-nav-color-hover: #ff5900;
+    --border-color: #ccc;
+    --input-border-color: #ddd;
+    --error-color: red;
+    --text-nav-color: rgb(29, 29, 29);
+}
+    
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--primary-nav-color);
+            box-shadow: 0 0 1px var(--primary-nav-color);
+        padding: 10px 30px;
+          
+    }
+    nav ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: space-around;
+    }
+    nav ul li {
+        display: inline;
+ 
+    }
+    nav ul li a {
+        color: var(--text-nav-color);
+        text-decoration: underline var(--primary-nav-color);
+       
+        padding: 10px 20px;
+        margin: 0  10px;
+        display: block;
+    }
+    nav ul li a:hover {
+        color: white;
+        border-radius:30px;
+        background-color: var(--primary-nav-color-hover);
+    }
+
+  .login-button {
+        background-color: var(--primary-nav-color);
+        color: white;
+        border-radius:25px;
+        padding: 15px 25px;
+        border: none;
+        cursor: pointer;
+    }
+    .login-button:hover {
+        background-color:#ffffff;
+        border: 2px solid var(--primary-color);
+        color: rgb(0, 0, 0);
+      text-decoration:underline;
+        transition: all 0.3s ease;
+        
+    }
+
+/* Add styles for the hamburger icon */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    font-size: 30px;
+    color: var(--text-nav-color);
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    nav ul {
+        display: none; /* Hide the list items */
+      
+        position: absolute;
+        top: 75px; /* Adjust based on your nav height */
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.717);
+        width: 100%;
+        z-index: 100;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    nav ul.show {
+        display: flex; /* Show the list items when the menu is active */
+    }
+
+    .hamburger {
+        display: block; /* Show the hamburger icon */
+    }
+}

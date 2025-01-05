@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/css/navbar.css">
+<nav>
+    <a href="/" style="text-decoration: none;">
+        <span style="display: flex; align-items: center;">
+            <img src="/img/logo.jpg" width="50px" alt="Logo">
+            <span class="logo-text" style="font-size: 20px; font-weight: bold; color: #ff5900;">SACHA SUADA</span>
+        </span>
+    </a>
+    <div class="hamburger" style="color: #ff5900;" onclick="toggleMenu()">☰</div>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/story">Our Story</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+    <% if (isAuthenticated) { %>
+        <a href="/logout"><button class="login-button">Logout</button></a>
+    <% } else { %>
+        <a href="/login"><button class="login-button">Login</button></a>
+    <% } %>
+</nav>
+
+<script>
+function toggleMenu() {
+    const navUl = document.querySelector('nav ul');
+    navUl.classList.toggle('show');
+}
+</script>

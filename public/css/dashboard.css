@@ -1,0 +1,82 @@
+:root {
+    --primary-color: #ff5900;
+    --primary-color-hover: #d05508;
+    --border-color: #ccc;
+    --input-border-color: #ddd;
+    --error-color: red;
+    --text-color: white;
+    --background-color: #fff;
+    --text-secondary-color: #333;
+    --box-shadow-color: rgba(0, 0, 0, 0.1);
+
+}
+body{padding:0;margin:0;
+font-family: 'Arial', sans-serif;}
+.container {
+    display: flex; /* Ensures Flexbox layout */
+    flex-direction: row; /* Aligns items in a row */
+    gap: 20px; /* Adds spacing between child elements */
+    justify-content: flex-start; /* Aligns items to the start of the row */
+}
+
+
+.info-card {
+    display: inline-block; 
+    max-width: 300px;
+    text-align: center;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--box-shadow-color);
+    margin: 20px;
+    padding: 20px;
+}
+
+.card-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-content h3 {
+    margin: 0 0 10px;
+    color: var(--primary-color);
+}
+
+.card-content p {
+    margin: 5px 0;
+    color: var(--text-secondary-color);
+}
+
+.card-content .btn {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.card-content .btn:hover {
+    background-color: var(--primary-color-hover);
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Change to column layout on mobile */
+        align-items: center; /* Center items horizontally */
+    }
+
+    .info-card {
+        max-width: 90%; /* Adjust card width for mobile */
+        margin: 10px auto; /* Center card with auto margins */
+    }
+}

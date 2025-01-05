@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <title>Dashboard</title>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <h1>Welcome, <span style="color: var(--primary-color);"><%= currentUser.username %></span></h1>
+    <div class="container">
+      
+
+        <!-- Display info cards for opposite role users -->
+        <div class="info-cards">
+            <% if (oppositeUsers.length > 0) { %>
+                <% oppositeUsers.forEach(user => { %>
+                    <div class="info-card">
+                        <img src="<%= user.profileImage || '/img/default-ngo.jpg' %>" alt="Profile Image" class="card-image">
+                        <div class="card-content">
+                            <h3>Name: <%= user.username %></h3>
+                            <p>Contact No: <%= user.contact %></p>
+                            <p>Email: <%= user.email %></p>
+                            <p>City: <%= user.city %></p>
+                            <p>Address: <%= user.address %></p>
+                            <% if (currentUser.role === 'restaurant') { %>
+                                <button class="btn" onclick="showQRCode('<%= user.contact %>')">Contact</button>
+                            <% } else if (currentUser.role === 'ngo') { %>
+                                <button class="btn" onclick="showQRCode('<%= user.contact %>')">Contact</button>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>No users to display.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Function to show QR code
+        function showQRCode(contactNumber) {
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=tel:${contactNumber}&size=150x150`;
+            const qrWindow = window.open('', '_blank', 'width=200,height=200');
+            qrWindow.document.write(`<img src="${qrCodeUrl}" alt="QR Code">`);
+        }
+    </script>
+</body>
+</html>
