@@ -212,8 +212,8 @@ app.post('/admin-login', async (req, res) => {
 // Admin dashboard
 app.get('/admin-dashboard', authenticateToken, async (req, res) => {
     if (!req.isAuthenticated || !req.user.isAdmin) {
-        return res.redirect('/login');
-    }
+            return res.redirect('/login');
+        }
 
     try {
         const users = await User.find().select('-password');
@@ -227,8 +227,8 @@ app.get('/admin-dashboard', authenticateToken, async (req, res) => {
 // Verify user route
 app.post('/verify-user', authenticateToken, async (req, res) => {
     if (!req.isAuthenticated || !req.user.isAdmin) {
-        return res.redirect('/login');
-    }
+            return res.redirect('/login');
+        }
 
     try {
         const { userId } = req.body;
@@ -347,7 +347,7 @@ app.get('/edit-profile/:userId', authenticateToken, async (req, res) => {
 });
 
 app.post('/edit-profile/:userId', authenticateToken, upload.single('profilePicture'), async (req, res) => {
-    const { userId } = req.params || req.user.id;
+    const userId = req.params.userId;
     const {
         username, email, contact, address,
         foodType, avgFoodQuantity, typicalTime, packagingAvailable, notePackaging,
@@ -398,7 +398,7 @@ app.post('/edit-profile/:userId', authenticateToken, upload.single('profilePictu
 
         await User.findByIdAndUpdate(userId, updateData);
 
-        res.redirect('/dashboard/'+userId);
+        res.redirect('/dashboard/' + userId);
     } catch (error) {
         console.error(error);
         res.status(500).render('error', { error: 'An error occurred', isAuthenticated: req.isAuthenticated });
