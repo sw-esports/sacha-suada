@@ -1,0 +1,156 @@
+<link rel="stylesheet" href="/css/edit-profile.css">
+
+
+<body>
+   
+ 
+    <%- include('partials/navbar') %>   
+  
+  
+    <h2 style="color: var(--primary-color); font-weight: bold;margin: 30px; text-align: center;">Edit Profile </h2>
+
+    <% if (user.role === 'restaurant') { %>
+    <!-- First form for resurents -->
+    <form action="/edit-profile/<%= user._id %>" method="post" enctype="multipart/form-data">
+        <div class="section-title">Profile Details</div>
+        <label for="profilePicture" style="font-weight: bold;background-color:white;width: 100%;">Profile Picture</label>
+        <div class="field" style="display: flex; align-items: center;">
+            <img src="/uploads/<%= user.profilePicture %>" onerror="this.onerror=null; this.src='/uploads/default.png'" width="100" height="100" alt="Profile Picture" class="profile-picture">
+            <input style="color: var(--primary-color);" type="file" name="profilePicture" id="profilePicture">
+        </div>
+
+        <div class="profile-details">
+            <div class="field">
+                <label for="username">Username</label>
+                <input type="text" value="<%= user.username %>" name="username" placeholder="Enter your username">
+
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="text" value="<%= user.email %>" name="email" placeholder="Enter your email">
+            </div>
+            <div class="field">
+                <label for="contact">Contact</label>
+                <input type="text" value="<%= user.contact %>" name="contact" placeholder="Enter your contact">
+            </div>
+            <div class="field">
+                <label for="address">Address</label>
+                <input type="text" value="<%= user.address %>" name="address" placeholder="Enter your address">
+            </div>
+        </div>
+       <div class="section-title">Food Available</div>
+       <div class="food-available">
+        <div class="field">
+            <label for="foodType">Type of Surplus Food Available (e.g., Cooked Food, Raw Ingredients, etc.)</label>
+            <input type="text" value="<%= user.foodType %>" name="foodType" placeholder="Enter the type of food">
+           </div>
+            <div class="field">
+                <label for="avgFoodQuantity">Average Quantity of Leftover Food Per Event/Week</label>
+                <input type="text" value="<%= user.avgFoodQuantity %>" name="avg-food-quantity" placeholder="Enter the average quantity of food">
+            </div>
+            <div class="field">
+                <label for="typicalTime">Typical Days and Times Food is Available for Pickup</label>
+                <input type="text" value="<%= user.typicalTime %>"  name="typical-time" placeholder="Enter the typical days and times">
+            </div>
+       </div>
+       <div class="section-title">Packaging</div>
+       <div class="packaging">
+        <div class="field">
+            <label for="packaging-available">Do you have proper packaging for surplus food?</label>
+            <input type="radio" name="packagingAvailable" id="packaging-yes" value="Yes"><label for="packaging-yes">Yes</label>
+                <input type="radio" name="packagingAvailable" id="packaging-no" value="No"><label for="packaging-no">No</label>
+        </div>
+            <div class="field">
+                <label for="note-packaging">Additional Notes About Food Storage </label>
+                <input type="text" value="<%= user.notePackaging %>" name="notePackaging" id="note-packaging" placeholder="Note for packaging">
+            </div>
+       </div>
+       <div class="section-title">Participation and Benefits</div>
+       <div class="participation-benefits">
+            <p>We offer government sustainability certificates to the vendors and restaurants being catered as 100% sustainable on Swiggy and Zomato however both are time taking procedures pls keep contributing to sustainability!</p>
+            <div class="field">
+                <label for="zomato-availability">Would you like to be featured on Zomato and Swiggy as 100% sustainable?</label>
+                <input type="radio" name="zomatoAvailability" id="zomato-yes" value="Yes"><label for="zomato-yes">Yes</label>
+                <input type="radio" name="zomatoAvailability" id="zomato-no" value="No"><label for="zomato-no">No</label>
+            </div>
+            <div class="field">
+                <label for="government-certificate">Would you like to receive a government-issued sustainability certificate for your participation?</label>
+                <input type="radio" name="governmentCertificate" id="government-certificate-yes" value="Yes"><label for="government-certificate-yes">Yes</label>
+                <input type="radio" name="governmentCertificate" id="government-certificate-no" value="No"><label for="government-certificate-no">No</label>
+            </div>
+       </div>
+       <div class="section-title">Agreement and Additional Details</div>
+       <div class="agreement-additional-details">
+            <div class="field">
+                <label for="food-safety-guidelines">Are you willing to comply with food safety guidelines?</label>
+                <input type="radio" name="foodSafetyGuidelines" id="food-safety-guidelines-yes" value="Yes"><label for="food-safety-guidelines-yes">Yes</label>
+                <input type="radio" name="foodSafetyGuidelines" id="food-safety-guidelines-no" value="No"><label for="food-safety-guidelines-no">No</label>
+            </div>
+            <div class="field">
+                <label for="additional-details">Any thing you want us to know? or tell us?</label>
+                <input type="text" value="<%= user.additionalDetails %>" name="additionalDetails" id="additional-details" placeholder="Enter any additional details">
+            </div>
+       </div>
+       <div class="field" style="display: flex; justify-content: center;">
+            <button type="submit" class="submit-btn">Update</button>
+       </div>
+    </form>
+    <% } else if (user.role === 'ngo') { %>
+    <!-- Second form for ngo -->
+    <form action="/edit-profile/<%= user._id %>" method="post" enctype="multipart/form-data">
+        <div class="section-title">Profile Details</div>
+        <label for="profilePicture" style="font-weight: bold;background-color:white;width: 100%;">Profile Picture</label>
+        <div class="field" style="display: flex; align-items: center;">
+            <img src="/uploads/<%= user.profilePicture %>" onerror="this.onerror=null; this.src='/uploads/default.png'" width="100" height="100" alt="Profile Picture" class="profile-picture">
+            <input style="color: var(--primary-color);" type="file" name="profilePicture" id="profilePicture">
+        </div>
+        <div class="section-title">Target beneficiaries </div>
+        <div class="food-available">
+         <div class="field">
+             <label for="targetBeneficiaries">Who are your target beneficiaries? (e.g., Homeless, Children, Elderly, etc.) </label>
+             <input type="text" value="<%= user.targetBeneficiaries %>" name="targetBeneficiaries" placeholder="Enter the target beneficiaries">
+            </div>
+             <div class="field">
+                 <label for="avgPeople">How many people do you serve on average per day? 
+
+                 </label>
+                    <input type="text" value="<%= user.avgPeople %>" name="avgPeople" placeholder="Enter the average quantity of people">
+             </div>
+        </div>
+        <div class="section-title">Logistics and pickup capacity </div>
+        <div class="packaging">
+         <div class="field">
+             <label for="transportationAvailable">Do you have transportation for food pickup?      </label>
+             <input type="radio" name="transportationAvailable" id="transportation-yes" value="Yes"><label for="transportation-yes">Yes</label>
+             <input type="radio" name="transportationAvailable" id="transportation-no" value="No"><label for="transportation-no">No</label>
+         </div>
+             <div class="field">
+                 <label for="preferredTimeSlots">Preferred Time Slots for Pickup 
+                     <input type="text" value="<%= user.preferredTimeSlots %>"  name="preferredTimeSlots" id="preferred-time-slots" placeholder="Enter the preferred time slots">
+             </div>
+             <div class="field">
+                 <label for="maxDistance">Maximum Distance You Can Travel for Food Pickup
+                     <input type="text" value="<%= user.maxDistance %>"     name="maxDistance" id="max-distance" placeholder="Enter the maximum distance">
+             </div>
+        </div>
+       
+        <div class="section-title">Agreement and Additional Details</div>
+        <div class="agreement-additional-details">
+             <div class="field">
+                 <label for="food-safety-guidelines">Are you willing to comply with food safety guidelines?</label>
+                 <input type="radio" name="foodSafetyGuidelines" id="food-safety-guidelines-yes" value="Yes"><label for="food-safety-guidelines-yes">Yes</label>
+                 <input type="radio" name="foodSafetyGuidelines" id="food-safety-guidelines-no" value="No"><label for="food-safety-guidelines-no">No</label>
+             </div>
+             <div class="field">
+                 <label for="additional-details">Any thing you want us to know? or tell us?</label>
+                 <input type="text" value="<%= user.additionalDetails %>" name="additionalDetails" id="additional-details" placeholder="Enter any additional details">
+             </div>
+        </div>
+        <div class="field">
+             <button type="submit" class="submit-btn">Update</button>
+        </div>
+     </form>
+    <% } %>
+
+    
+</body>

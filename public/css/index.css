@@ -4,10 +4,10 @@
     --border-color: #ccc;
     --input-border-color: #ddd;
     --error-color: red;
-    --text-color: rgb(36, 36, 36);
+    --text-color: rgb(0, 0, 0);
 }
 body{padding:0;margin:0;
-    background-image: url('/img/index-bg3.jpg');
+    background-image: url('/img/index-bg4.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -25,9 +25,11 @@ body{padding:0;margin:0;
     padding: 0 50px;
 }
 .carousel-text {
-
+    text-align: center;
+    padding: 20px;
     max-width: 50%;
-    background: #ffffff41;
+    background: #bababa80;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
     border-radius: 10px;
 }
 .carousel-text h1 {

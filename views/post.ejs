@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/post.css">
+    <title>Create Post</title>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <h2>Create a New Post</h2>
+    <form action="/post/<%= user._id %>" method="post" enctype="multipart/form-data">
+       <div class="section-title">Post</div>
+       <div class="field">
+        <div class="field">
+            <label for="image">Image</label>
+            <input type="file" name="image" id="image" required>
+        </div>
+        <div class="field">
+            <label for="quantity">Quantity</label>
+            <input type="number" name="quantity" id="quantity" required>
+        </div>
+        <div class="field">
+            <label for="foodType">Type of Food</label>
+            <input type="text" name="foodType" id="foodType" required>
+        </div>
+        <button class="submit-btn" type="submit">Create Post</button>
+       </div>
+    </form>
+
+    <h2>Your Donations History</h2>
+    <ul>
+        <% posts.forEach(post => { %>
+            <li class="info-card">
+                <img src="/uploads/<%= post.image %>" alt="Post Image" class="card-image" width="100">
+                <div class="card-content">
+                    <p>Quantity: <%= post.quantity %></p>
+                    <p>Type of Food: <%= post.foodType %></p>
+                    <p>Created At: <%= post.createdAt.toDateString() %></p>
+                    <button class="btn" onclick="editPost('<%= post._id %>')">Edit</button>
+                </div>
+            </li>
+        <% }) %>
+    </ul>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <nav>
     <a href="/" style="text-decoration: none;">
         <span style="display: flex; align-items: center;">
-            <img src="/img/logo.jpg" width="50px" alt="Logo">
+            <img src="/img/logo.jpg" width="50px"  alt="Logo">
             <span class="logo-text" style="font-size: 20px; font-weight: bold; color: #ff5900;">SACHA SUADA</span>
         </span>
     </a>
@@ -11,10 +11,19 @@
         <li><a href="/">Home</a></li>
         <li><a href="/about">About</a></li>
         <li><a href="/story">Our Story</a></li>
-        <li><a href="/contact">Contact</a></li>
+        <li><a href="/contact">Contact </a></li>
     </ul>
     <% if (isAuthenticated) { %>
-        <a href="/logout"><button class="login-button">Logout</button></a>
+    <div class="user-menu">
+        <img src="/uploads/<%= user.profilePicture %>" alt="Profile Picture" class="profile-picture">
+        <span class="username"><%= user.username %></span>
+        <div class="dropdown-content">
+            <a href="/post/<%= user.id %>"><img width="20px" src="/img/post.svg" alt=""> Post</a>
+            <a href="/dashboard/<%= user.id %>"><img width="20px" src="/img/dashboard.svg" alt=""> Dashboard</a>
+            <a href="/edit-profile/<%= user.id %>"><img width="20px" src="/img/edit.svg" alt=""> Edit Profile</a>
+            <a href="/logout"><img width="20px" src="/img/logout.svg" alt=""> Logout</a>
+        </div>
+    </div>
     <% } else { %>
         <a href="/login"><button class="login-button">Login</button></a>
     <% } %>

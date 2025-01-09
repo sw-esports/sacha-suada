@@ -7,7 +7,9 @@
     --text-color: white;
 }
 body {
-    background-image: url('/img/registration-bg.jpg');
+    height: 100vh;
+    width: 100vw;
+    background-image: url('/img/registration-bg-2.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -19,10 +21,12 @@ body {
 
 
 .container {
-    background-color: #fffffff1;
-    max-width: 400px;
+    background-color: #ffffff9a;
+    max-width: 40%;
+    height: 60%;
     margin: 50px auto;
-    padding: 20px;
+    padding: 3%;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.689);
     border: 1px solid var(--border-color);
     border-radius: 10px;
 }
@@ -38,7 +42,11 @@ body {
     padding: 8px;
     border: 1px solid var(--input-border-color);
     border-radius: 4px;
+   
+       
 }
+
+
 .btn {
     background-color: var(--primary-color);
     color: var(--text-color);
@@ -54,4 +62,18 @@ body {
 .error-message {
     color: var(--error-color);
     margin-bottom: 10px;
+}
+@media (max-width: 700px) {
+    .container {
+        max-width: 90%;
+        height: 20%;
+        margin: 20px auto;
+        padding: 5%;
+    }
+    .form-group input {
+        padding: 10px;
+    }
+    .btn {
+        padding: 12px 20px;
+    }
 }

@@ -7,7 +7,7 @@
     --text-color: white;
 }
 body {
-    background-image: url('/img/registration-bg.jpg');
+    background-image: url('/img/registration-bg-2.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -19,10 +19,11 @@ body {
 
 
 .container {
-    background-color: #fffffff1;
+    background-color: #ffffff9a;
     max-width: 400px;
     margin: 50px auto;
     padding: 20px;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.689);
     border: 1px solid var(--border-color);
     border-radius: 10px;
 }
