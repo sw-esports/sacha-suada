@@ -11,8 +11,10 @@ const Admin = require('./models/Admin'); // Admin schema
 const Post = require('./models/Post');
 const upload = require('./config/multerConfig'); // Import the upload configuration
 const errorHandler = require('./middlewares/errorHandler');
+const apicache = require('apicache');
 
 const app = express();
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,14 +22,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, { // Use environment variable
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log("Connected to MongoDB");
-}).catch(err => {
-    console.error("Connection error:", err); // Important console log
-});
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log("Connected to MongoDB");
+    })
+    .catch(err => {
+        console.error("Connection error:", err); // Important console log
+    });
 
 // Secret key for JWT
 const SECRET_KEY = process.env.SECRET_KEY; // Use environment variable
@@ -79,8 +80,11 @@ app.use(async (req, res, next) => {
     next();
 });
 
+// Initialize cache
+const cache = apicache.middleware;
+
 // Routes
-app.get("/", async (req, res) => {
+app.get("/", cache('5 minutes'), async (req, res, next) => {
     res.render("index"); // user and isAuthenticated are available via res.locals
 });
 
@@ -89,7 +93,7 @@ app.get("/login", (req, res) => {
     res.render("login", { isAuthenticated: req.isAuthenticated });
 });
 
-app.post("/login", async (req, res, next) => {
+app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -107,8 +111,8 @@ app.post("/login", async (req, res, next) => {
         res.cookie('token', token, { httpOnly: true });
         res.redirect('/dashboard/'+user._id);
     } catch (error) {
-        console.error("Login error:", error); // Important console log
-        next(error); // Pass error to the error-handling middleware
+        console.error("Login error:", error);
+        res.status(500).render('login', { error: "An error occurred. Please try again later.", isAuthenticated: false });
     }
 });
 
@@ -170,7 +174,7 @@ app.post("/user-role", async (req, res) => {
 });
 
 // Protected dashboard route
-app.get('/dashboard/:userId', async (req, res) => {
+app.get('/dashboard/:userId', cache('2 minutes'), async (req, res, next) => {
     if (!req.isAuthenticated) {
         return res.redirect('/login');
     }

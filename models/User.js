@@ -10,7 +10,7 @@ const notificationSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     vendorName: { type: String },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, index: true },
     password: { type: String, required: true },
     address: { type: String },
     contact: { type: String },
