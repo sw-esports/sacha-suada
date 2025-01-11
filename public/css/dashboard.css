@@ -9,8 +9,13 @@
     --text-secondary-color: #333;
     --box-shadow-color: rgba(0, 0, 0, 0.1);
 }
-body{padding:0;margin:0;
-font-family: 'Arial', sans-serif;}
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+
 .container {
     display: flex; /* Ensures Flexbox layout */
     flex-direction: row; /* Aligns items in a row */
@@ -20,8 +25,8 @@ font-family: 'Arial', sans-serif;}
 }
 
 .info-card {
-    display: inline-block; 
-    width: 300px; /* Set a fixed width for all info cards */
+    display: inline-block;
+    width: 300px;
     text-align: center;
     background-color: var(--background-color);
     border: 1px solid var(--border-color);
@@ -29,6 +34,8 @@ font-family: 'Arial', sans-serif;}
     box-shadow: 0 4px 8px var(--box-shadow-color);
     margin: 20px;
     padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevents overflow of content */
 }
 
 .card-image {
@@ -65,6 +72,97 @@ font-family: 'Arial', sans-serif;}
 }
 
 .card-content .btn:hover {
+    background-color: var(--primary-color-hover);
+}
+
+.restaurant-info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 5%;
+    left: 5%;
+    width: 80%;
+    max-width: 100%; /* Prevents overflow on smaller screens */
+    padding: 20px;
+    background-color: var(--background-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--box-shadow-color);
+    z-index: 1000;
+    overflow: auto;
+    color: var(--primary-color);
+    display: none; /* Initially hidden */
+    overflow: hidden;
+}
+
+.restaurant-info-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.restaurant-info-content {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+}
+
+.restaurant-info-left, .restaurant-info-right {
+    width: calc(50% - 10px);
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.restaurant-info-left img, .restaurant-info-right img {
+    width: 40%; /* Adjusted to take full width of the container */
+    height: auto; /* Allow height to adjust based on width */
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;    
+}
+
+.restaurant-info p {
+    margin: 10px 0;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: #cc0000;
+}
+
+.request-donation-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.request-donation-btn:hover {
     background-color: var(--primary-color-hover);
 }
 

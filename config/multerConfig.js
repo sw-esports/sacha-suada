@@ -8,7 +8,9 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const userId = req.params.userId; // Get userId from request parameters
-        cb(null, userId + path.extname(file.originalname)); // Use userId as the filename
+        const fileType = file.fieldname; // Get the field name to differentiate file types
+        const timestamp = Date.now(); // Create a unique timestamp
+        cb(null, `${fileType}-${userId}-${timestamp}${path.extname(file.originalname)}`); // Use userId and timestamp as the filename
     }
 });
 

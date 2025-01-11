@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="/css/notification.css"> <!-- Link to your CSS -->
+</head>
+<style>
+    .notification-item-div {
+    display: flex
+;
+    align-items: center;
+    background-color: var(--background-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px; 
+    color: black;
+    text-decoration: none;
+    display: block;
+}
+</style>
+<body>
+    <%- include('partials/navbar') %>
+    <h1>Notifications</h1>
+    <% if (notifications.length > 0) { %>
+        <% notifications.forEach(notification => { %>
+            <div class="notification-item-div">
+                <h2>Request from <%= notification.fromUserId.username %></h2>
+                <p>Contact: <%= notification.fromUserId.contact %></p>
+                <p>Email: <%= notification.fromUserId.email %></p>
+                <p>City: <%= notification.fromUserId.city || 'Not specified' %></p>
+                <% if (notification.status === 'accepted') { %>
+                    <button class="accepted-button" style="background-color: rgb(58, 197, 58); color: white;">Request Accepted</button>
+                    <button type="submit" onclick="deleteNotification('<%= notification._id %>')" style="background-color: rgb(255, 0, 0); color: white;">Delete</button>
+                <% } else if (notification.status === 'rejected') { %>
+                    <button class="rejected-button" style="background-color: rgb(195, 41, 41); color: white;">Request Rejected</button>
+                    <button type="submit" onclick="deleteNotification('<%= notification._id %>')" style="background-color: rgb(255, 0, 0); color: white;">Delete</button>
+                <% } else { %>
+                 <div class="notification-item" style="display: flex;  align-items: center;">
+                    <form action="/notifications/<%= notification._id %>/accept" method="POST">
+                        <button style="background-color: rgb(58, 197, 58); color: white;" type="submit">Accept</button>
+                    </form>
+                    <form action="/notifications/<%= notification._id %>/reject" method="POST">
+                        <button style="background-color: rgb(195, 41, 41); color: white;" type="submit">Reject</button>
+                    </form>
+                    <form action="/notifications/<%= notification._id %>/delete" method="POST" style="display:inline;">
+                        <button type="submit" style="background-color: rgb(255, 0, 0); color: white;">Delete</button>
+                    </form>
+                 </div>
+                <% } %>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No notifications available.</p>
+    <% } %>
+    <script>
+        function deleteNotification(notificationId) {
+            fetch(`/notifications/${notificationId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data.message);
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+
+</html>

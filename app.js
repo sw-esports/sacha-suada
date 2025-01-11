@@ -1,7 +1,8 @@
+require('dotenv').config(); // Load environment variables
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -9,6 +10,7 @@ const User = require('./models/User'); // User schema
 const Admin = require('./models/Admin'); // Admin schema
 const Post = require('./models/Post');
 const upload = require('./config/multerConfig'); // Import the upload configuration
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 app.set("view engine", "ejs");
@@ -18,17 +20,17 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://lordsjmy:NWNgyPDBhY5ep3uf@suraj.ntjic.mongodb.net/?retryWrites=true&w=majority&appName=suraj', {
+mongoose.connect(process.env.MONGODB_URI, { // Use environment variable
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
     console.log("Connected to MongoDB");
 }).catch(err => {
-    console.error("Connection error", err);
+    console.error("Connection error:", err); // Important console log
 });
 
 // Secret key for JWT
-const SECRET_KEY = "yourSuperSecretKey"; // Replace with an environment variable in production
+const SECRET_KEY = process.env.SECRET_KEY; // Use environment variable
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
@@ -50,10 +52,36 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-app.use(authenticateToken); // Global middleware
+app.use(authenticateToken); // Global authentication middleware
 
-app.get("/", (req, res) => {
-    res.render("index", { isAuthenticated: req.isAuthenticated });
+// Middleware to set user and notifications in res.locals
+app.use(async (req, res, next) => {
+    if (req.isAuthenticated && req.user) {
+        try {
+            const user = await User.findById(req.user.id)
+                .populate('notifications.fromUserId', 'username profilePicture email contact city')
+                .populate('notifications.postId'); // Populate postId if needed
+
+            res.locals.user = user;
+            res.locals.notifications = user.notifications || [];
+            res.locals.isAuthenticated = req.isAuthenticated;
+        } catch (err) {
+            console.error("Error fetching user data for res.locals:", err); // Important console log
+            res.locals.user = null;
+            res.locals.notifications = [];
+            res.locals.isAuthenticated = false;
+        }
+    } else {
+        res.locals.user = null;
+        res.locals.notifications = [];
+        res.locals.isAuthenticated = false;
+    }
+    next();
+});
+
+// Routes
+app.get("/", async (req, res) => {
+    res.render("index"); // user and isAuthenticated are available via res.locals
 });
 
 // Login routes
@@ -61,7 +89,7 @@ app.get("/login", (req, res) => {
     res.render("login", { isAuthenticated: req.isAuthenticated });
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
@@ -79,8 +107,8 @@ app.post("/login", async (req, res) => {
         res.cookie('token', token, { httpOnly: true });
         res.redirect('/dashboard/'+user._id);
     } catch (error) {
-        console.error(error);
-        res.status(500).render('login', { error: "An error occurred. Please try again later.", isAuthenticated: false });
+        console.error("Login error:", error); // Important console log
+        next(error); // Pass error to the error-handling middleware
     }
 });
 
@@ -110,7 +138,7 @@ app.post("/register", async (req, res) => {
         res.cookie('token', token, { httpOnly: true });
         res.redirect('/user-role');
     } catch (error) {
-        console.error(error);
+        console.error("Registration error:", error);
         res.status(500).render('register', { error: "An error occurred. Please try again later.", isAuthenticated: false });
     }
 });
@@ -141,39 +169,42 @@ app.post("/user-role", async (req, res) => {
    
 });
 
-
 // Protected dashboard route
-app.get('/dashboard/:userId', authenticateToken, async (req, res) => {
+app.get('/dashboard/:userId', async (req, res) => {
     if (!req.isAuthenticated) {
         return res.redirect('/login');
     }
-    const userId = req.params.userId || req.user.id;
 
     try {
-        const currentUser = await User.findById(userId).select('-password');
-        
-        // Find opposite roles
-        let oppositeUsers;
-        let posts;
+        const userId = req.params.userId || req.user.id;
+        const currentUser = await User.findById(userId)
+            .select('-password')
+            .populate('notifications.fromUserId', 'username profilePicture city contact foodType quantity preferredTimeSlots maxDistance')
+            .populate('notifications.postId');
+
+        const notifications = currentUser.notifications || [];
+
+        let oppositeUsers = [];
+        let posts = [];
+
         if (currentUser.role === 'restaurant') {
             oppositeUsers = await User.find({ role: 'ngo' }).select('-password');
-            posts = await Post.find({ user: { $in: oppositeUsers.map(user => user._id) } }).populate('user', 'username contact');
         } else if (currentUser.role === 'ngo') {
             oppositeUsers = await User.find({ role: 'restaurant' }).select('-password');
-            posts = await Post.find({ user: { $in: oppositeUsers.map(user => user._id) } }).populate('user', 'username contact');
-            console.log(posts);
-        } else {
-            oppositeUsers = [];
-            posts = [];
+            posts = await Post.find({ user: { $in: oppositeUsers.map(user => user._id) } }).populate('user', 'username contact profilePicture');
         }
 
-        res.render('dashboard', { user: currentUser, oppositeUsers, posts, isAuthenticated: req.isAuthenticated });
+        res.render('dashboard', { 
+            user: currentUser, 
+            oppositeUsers, 
+            posts 
+            // isAuthenticated and notifications are available via res.locals
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).render('error', { error: "An error occurred", isAuthenticated: req.isAuthenticated });
+        console.error("Dashboard error:", error); // Important console log
+        res.status(500).render('error', { error: "An error occurred" });
     }
 });
-
 
 // Logout route
 app.get('/logout', (req, res) => {
@@ -272,14 +303,12 @@ app.get('/setup-profile/:userId', authenticateToken, async (req, res) => {
     }
 });
 
-
-
 // Route to handle profile setup
 app.post('/setup-profile/:userId', authenticateToken, async (req, res) => {
     const { userId } = req.params;
     const user = await User.findById(userId)
     const userRole = user.role;
-    console.log(userRole);
+   
     const {
         foodType, avgFoodQuantity, typicalTime, packagingAvailable, notePackaging,
         zomatoAvailability, governmentCertificate, foodSafetyGuidelines, additionalDetails,
@@ -323,7 +352,7 @@ app.post('/setup-profile/:userId', authenticateToken, async (req, res) => {
 
         res.redirect('/dashboard/' + userId);
     } catch (error) {
-        console.error(error);
+        console.error("Edit profile error:", error);
         res.status(500).render('error', { error: 'An error occurred', isAuthenticated: req.isAuthenticated });
     }
 });
@@ -400,7 +429,7 @@ app.post('/edit-profile/:userId', authenticateToken, upload.single('profilePictu
 
         res.redirect('/dashboard/' + userId);
     } catch (error) {
-        console.error(error);
+        console.error("Edit profile error:", error);
         res.status(500).render('error', { error: 'An error occurred', isAuthenticated: req.isAuthenticated });
     }
 });
@@ -446,15 +475,208 @@ app.post('/post/:userId', authenticateToken, upload.single('image'), async (req,
         });
 
         await newPost.save();
+
+        // Update the User model to include the new post ID
+        await User.findByIdAndUpdate(userId, { $push: { posts: newPost._id } });
+
         res.redirect('/post/' + userId);
+    } catch (error) {
+        console.error("Post creation error:", error);
+        res.status(500).render('error', { error: 'An error occurred', isAuthenticated: req.isAuthenticated });
+    }
+});
+
+app.post('/request-donation/:postId', authenticateToken, async (req, res) => {
+    const postId = req.params.postId;
+    const userId = req.user.id;
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).send('Post not found');
+        }
+
+        // Create a notification for the post owner
+        const notification = {
+            type: 'donation_request',
+            postId: postId,
+            fromUserId: userId,
+            status: 'pending'
+        };
+
+        // Add notification to the post owner's notifications
+        await User.findByIdAndUpdate(post.user, { $push: { notifications: notification } });
+
+        res.status(200).send('Request sent successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred');
+    }
+});
+
+// Route to render notifications
+app.get('/notifications', authenticateToken, async (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const user = await User.findById(req.user.id)
+            .populate('notifications.fromUserId', 'username profilePicture email contact city') // Include additional fields
+            .populate('notifications.postId'); // Populate postId if needed
+
+        const notifications = user.notifications || [];
+        res.render('notification', { notifications, isAuthenticated: req.isAuthenticated, user });
     } catch (error) {
         console.error(error);
         res.status(500).render('error', { error: 'An error occurred', isAuthenticated: req.isAuthenticated });
     }
 });
 
+// Accept donation request
+app.post('/notifications/:notificationId/accept', authenticateToken, async (req, res) => {
+    const notificationId = req.params.notificationId;
+    const userId = req.user.id;
+
+    try {
+        // Find the notification and update its status to accepted
+        const notificationUpdateResult = await User.updateOne(
+            { 'notifications._id': notificationId },
+            { $set: { 'notifications.$.status': 'accepted' } }
+        );
+
+        // Check if the notification was updated
+        if (notificationUpdateResult.nModified === 0) {
+            return res.status(404).send('Notification not found or already accepted');
+        }
+
+        // Get the notification details to find the requester
+        const notificationDetails = await User.findOne(
+            { 'notifications._id': notificationId },
+            { 'notifications.$': 1 }
+        );
+
+        if (notificationDetails) {
+            const requesterId = notificationDetails.notifications[0].fromUserId; // Get the requester ID
+
+            // Check if a response notification already exists
+            const existingNotification = notificationDetails.notifications.find(n => n.fromUserId.toString() === userId && n.postId.toString() === notificationDetails.notifications[0].postId);
+            if (!existingNotification) {
+                // Create a new notification for the requester
+                const newNotification = {
+                    type: 'donation_request',
+                    postId: notificationDetails.notifications[0].postId,
+                    fromUserId: userId,
+                    status: 'accepted'
+                };
+
+                // Push the new notification to the requester's notifications
+                await User.findByIdAndUpdate(requesterId, { $push: { notifications: newNotification } });
+            } else {
+                // Update the existing notification if it exists
+                await User.updateOne(
+                    { 'notifications._id': existingNotification._id },
+                    { $set: { 'notifications.$.status': 'accepted' } }
+                );
+            }
+
+            res.redirect('/notifications');
+        } else {
+            console.error("Notification details not found for ID:", notificationId);
+            res.status(404).send('Notification details not found');
+        }
+    } catch (error) {
+        console.error("Accept donation request error:", error);
+        res.status(500).send('An error occurred');
+    }
+});
+
+// Reject donation request
+app.post('/notifications/:notificationId/reject', authenticateToken, async (req, res) => {
+    const notificationId = req.params.notificationId;
+    const userId = req.user.id;
+
+    try {
+        // Find the notification and update its status to rejected
+        const notificationUpdateResult = await User.updateOne(
+            { 'notifications._id': notificationId },
+            { $set: { 'notifications.$.status': 'rejected' } }
+        );
+
+        // Check if the notification was updated
+        if (notificationUpdateResult.nModified === 0) {
+            return res.status(404).send('Notification not found or already rejected');
+        }
+
+        // Get the notification details to find the requester
+        const notificationDetails = await User.findOne(
+            { 'notifications._id': notificationId },
+            { 'notifications.$': 1 }
+        );
+
+        if (notificationDetails) {
+            const requesterId = notificationDetails.notifications[0].fromUserId; // Get the requester ID
+
+            // Check if a response notification already exists
+            const existingNotification = notificationDetails.notifications.find(n => n.fromUserId.toString() === userId && n.postId.toString() === notificationDetails.notifications[0].postId);
+            if (!existingNotification) {
+                // Create a new notification for the requester
+                const newNotification = {
+                    type: 'donation_request',
+                    postId: notificationDetails.notifications[0].postId,
+                    fromUserId: userId,
+                    status: 'rejected'
+                };
+
+                // Push the new notification to the requester's notifications
+                await User.findByIdAndUpdate(requesterId, { $push: { notifications: newNotification } });
+            } else {
+                // Update the existing notification if it exists
+                await User.updateOne(
+                    { 'notifications._id': existingNotification._id },
+                    { $set: { 'notifications.$.status': 'rejected' } }
+                );
+            }
+
+            res.redirect('/notifications');
+        } else {
+            console.error("Notification details not found for ID:", notificationId);
+            res.status(404).send('Notification details not found');
+        }
+    } catch (error) {
+        console.error("Reject donation request error:", error);
+        res.status(500).send('An error occurred');
+    }
+});
+
+// Route to handle notification deletion
+app.post('/notifications/:notificationId/delete', authenticateToken, async (req, res) => {
+    const notificationId = req.params.notificationId;
+    const userId = req.user.id;
+
+    try {
+        // Remove the notification from the user's notifications array
+        await User.findByIdAndUpdate(userId, { $pull: { notifications: { _id: notificationId } } });
+
+        // Send a JSON response indicating success
+        res.status(200).json({ message: 'Notification deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting notification:", error);
+        // Send a JSON response indicating an error
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
+
+// 404 Handler
+app.use((req, res, next) => {
+    res.status(404).render('error', { error: "Page Not Found", isAuthenticated: req.isAuthenticated });
+});
+
+// Error-Handling Middleware
+app.use(errorHandler);
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`); // Important console log
 });

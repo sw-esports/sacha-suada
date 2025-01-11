@@ -5,26 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/dashboard.css">
     <title>Dashboard</title>
+    <style>
+      
+    </style>
 </head>
 <body>
     <%- include('partials/navbar') %>
-    <h1>Welcome, <span style="color: var(--primary-color);"><%= user.username %></span></h1>
+    <h1>Welcome, <span style="color: var(--primary-nav-color);"><%= user.username %></span></h1>
     <div class="container">
-      
         <div class="posts">
             <% if (user.role === 'ngo') { %>
                 <% const restaurantPosts = posts %>
                 <% if (restaurantPosts.length > 0) { %>
                     <% restaurantPosts.forEach(post => { %>
                         <div class="post info-card">
-                            <img class="card-image" src="/uploads/<%= post.image %>" alt="Post Image">
-                           <div class="card-content">
-                            <h3>Quantity: <%= post.quantity %></h3>
-                            <p>Food Type: <%= post.foodType %></p>
-                            <p>Restaurant: <%= post.user.username %></p>
-                            <button class="btn" onclick="showQRCode('<%= post.user.contact %>')">Contact</button>
-                            <button class="btn" onclick="window.location.href='/view/post/<%= post._id %>'">View</button>
-                           </div>
+                            <div class="post-content">
+                                <img class="card-image" src="/uploads/<%= post.image %>" alt="Post Image" onerror="this.onerror=null; this.src='/img/default-ngo.jpg';">
+                                <div class="card-content">
+                                    <h3>Quantity: <%= post.quantity %></h3>
+                                    <p>Food Type: <%= post.foodType %></p>
+                                    <p>Restaurant: <%= post.user.username %></p>
+                                    <button class="btn" onclick="showQRCode('<%= post.user.contact %>')">Contact</button>
+                                    <button class="btn" onclick="showRestaurantInfo('<%= post.image %>', '<%= post.foodType %>', '<%= post.quantity %>', '<%= post.user.profilePicture %>', '<%= post.user.username %>', '<%= post.user.address %>', '<%= post.user.city %>')">View</button>
+                                    <button class="request-donation-btn" onclick="requestDonation('<%= post._id %>')">Request for Donation</button>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No posts to display.</p>
+                <% } %>
+            <% } else if (user.role === 'restaurant') { %>
+                <% const ngoData = oppositeUsers %>
+                <% if (ngoData.length > 0) { %>
+                    <% ngoData.forEach(ngo => { %>
+                        <div class="info-card">
+                            <div class="card-content">
+                                <img class="card-image" src="/uploads/<%= ngo.profilePicture %>" alt="Post Image" onerror="this.onerror=null; this.src='/img/default-ngo.jpg';">
+                                <h3>Ngo Information</h3>
+                                <p>Ngo Name: <%= ngo.username %></p>
+                                <p>City: <%= ngo.city %></p>
+                                <p>Contact: <%= ngo.contact %></p>
+                                <button class="btn" onclick="showQRCode('<%= ngo.contact %>')">Contact</button>
+                            </div>
                         </div>
                     <% }) %>
                 <% } else { %>
@@ -32,21 +55,28 @@
                 <% } %>
             <% } %>
         </div>
-        <% if (user.role === 'restaurant') { %>
-            <% oppositeUsers.filter(oppUser => oppUser.role === 'ngo').forEach(oppUser => { %>
-                <div class="info-card">
-                    <img src="/uploads/<%= oppUser.profilePicture || '/img/default-ngo.jpg' %>" alt="Profile Image" class="card-image">
-                    <div class="card-content">
-                        <h3>Name: <%= oppUser.username %></h3>
-                        <p>Contact No: <%= oppUser.contact %></p>
-                        <p>Email: <%= oppUser.email %></p>
-                        <p>City: <%= oppUser.city %></p>
-                        <p>Address: <%= oppUser.address %></p>
-                        <button class="btn" onclick="showQRCode('<%= oppUser.contact %>')">Contact</button>
-                    </div>
+        <div id="restaurant-info" class="restaurant-info-container">
+            <button class="close-button" onclick="closeRestaurantInfo()">Close</button>
+            <div class="restaurant-info-title">Restaurant Details</div>
+            <div class="restaurant-info-content">
+                <!-- Left Section -->
+                <div class="restaurant-info-left">
+                    <div class="restaurant-info-title">Post Information</div>
+                    <img id="post-image" alt="Post Image" onerror="this.onerror=null; this.src='/img/default-ngo.jpg';">
+                    <p><strong>Type of Food:</strong> <span id="food-type"></span></p>
+                    <p><strong>Quantity:</strong> <span id="food-quantity"></span></p>
+                    <button class="request-donation-btn">Request for Donation</button>
                 </div>
-            <% }) %>
-        <% } %>
+                <!-- Right Section -->
+                <div class="restaurant-info-right">
+                    <div class="restaurant-info-title">Restaurant Information</div>
+                    <img id="restaurant-image" alt="Restaurant Image" onerror="this.onerror=null; this.src='/img/default-ngo.jpg';">
+                    <p><strong>Restaurant Name:</strong> <span id="restaurant-name"></span></p>
+                    <p><strong>Address:</strong> <span id="restaurant-address"></span></p>
+                    <p><strong>City:</strong> <span id="restaurant-city"></span></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -55,6 +85,49 @@
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=tel:${contactNumber}&size=150x150`;
             const qrWindow = window.open('', '_blank', 'width=200,height=200');
             qrWindow.document.write(`<img src="${qrCodeUrl}" alt="QR Code">`);
+        }
+
+        // Function to show restaurant information
+        function showRestaurantInfo(postImage, foodType, quantity, restaurantImage, restaurantName, address, city) {
+            // Populate left section
+            document.getElementById('post-image').src = postImage ? `/uploads/${postImage}` : '/img/default-ngo.jpg';
+            document.getElementById('food-type').innerText = foodType;
+            document.getElementById('food-quantity').innerText = quantity;
+
+            // Populate right section
+            document.getElementById('restaurant-image').src = restaurantImage ? `/uploads/${restaurantImage}` : '/img/default-ngo.jpg';
+            document.getElementById('restaurant-name').innerText = restaurantName;
+            document.getElementById('restaurant-address').innerText = address;
+            document.getElementById('restaurant-city').innerText = city;
+
+            // Show the container
+            document.getElementById('restaurant-info').style.display = 'flex';
+        }
+
+        // Function to close the restaurant info
+        function closeRestaurantInfo() {
+            document.getElementById('restaurant-info').style.display = 'none';
+        }
+
+        // Function to request a donation
+        function requestDonation(postId) {
+            fetch(`/request-donation/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Donation request sent successfully!');
+                } else {
+                    alert('Failed to send donation request.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the request.');
+            });
         }
     </script>
 </body>
